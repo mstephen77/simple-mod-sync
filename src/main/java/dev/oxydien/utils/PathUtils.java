@@ -6,6 +6,7 @@ import org.jetbrains.annotations.Nullable;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public class PathUtils {
 
@@ -35,6 +36,32 @@ public class PathUtils {
             Files.createDirectories(Path.of(path));
         } catch (IOException e) {
             Log.Log.error("path-utils.create-folder.IOException", "Error while creating folder", e);
+        }
+    }
+
+    /**
+     * Sanitizes a given path by making sure it is a valid path and does not attempt to traverse outside the given base directory.
+     * Used so the mod cannot access files outside the base (minecraft) directory.
+     *
+     * @param basePath The base directory to work from.
+     * @param userProvidedPath The path specified by the user.
+     * @return The sanitized path.
+     * @throws SecurityException If the path is invalid or attempts to traverse outside the base directory.
+     */
+    public static String sanitizePath(String basePath, String userProvidedPath) {
+        try {
+            // Convert paths to canonical form
+            Path baseDir = Paths.get(basePath).toAbsolutePath().normalize();
+            Path requestedPath = baseDir.resolve(userProvidedPath).toAbsolutePath().normalize();
+
+            // Check if the requested path starts with the base directory
+            if (!requestedPath.startsWith(baseDir)) {
+                throw new SecurityException("Path traversal attempt detected");
+            }
+
+            return requestedPath.toString();
+        } catch (Exception e) {
+            throw new SecurityException("Invalid path", e);
         }
     }
 }

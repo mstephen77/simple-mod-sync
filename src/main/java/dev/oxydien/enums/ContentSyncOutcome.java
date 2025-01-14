@@ -6,4 +6,5 @@ public enum ContentSyncOutcome {
     ALREADY_EXISTS,
     INVALID_URL,
     DOWNLOAD_INTERRUPTED,
+    SUSPICIOUS_CONTENT,
 }

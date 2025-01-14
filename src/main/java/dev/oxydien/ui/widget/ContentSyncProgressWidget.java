@@ -61,7 +61,7 @@ public class ContentSyncProgressWidget implements Widget, Drawable, Element, Sel
         }
 
         // Mod name
-        String modName = this.content.getModName();
+        String modName = this.content.getName();
         context.drawText(this.textRenderer, String.format("§l%s§r", modName.substring(0, Math.min(22, modName.length()))),
                 this.getX() + 15, textHeight, 0xFF55FFFF, false);
         context.drawText(this.textRenderer, this.content.getType(), this.getX() + 180,

@@ -14,11 +14,11 @@ The file retrieved from the URL must follow this structure:
 
 ```json
 {
-  "sync_version": 2,
-  "content": [
+  "sync_version": 3,
+  "sync": [
     {
       "url": "https://example.com/url/to/mod.jar",
-      "mod_name": "some-mod_name",
+      "name": "some-mod_name",
       "version": "2.8.1",
       "type": "mod"
     }
@@ -26,6 +26,7 @@ The file retrieved from the URL must follow this structure:
 }
 ```
 > Add more mods/files as needed to the content array.
+> Additionally you can add 'modify' section to the file.
 
 ## Simple Setup Guide
 

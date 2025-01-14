@@ -5,6 +5,7 @@ public enum SyncState {
     CHECKING_REMOTE,
     PARSING_REMOTE,
     DOWNLOADING,
+    MODIFICATIONS,
     READY,
     DID_NOT_SYNC,
     NEEDS_RESTART,
