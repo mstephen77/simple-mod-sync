@@ -3,6 +3,7 @@
   "simple_mod_sync.ui.checking_remote": "Kontroluji server",
   "simple_mod_sync.ui.parsing_remote": "Čtení dat ze serveru",
   "simple_mod_sync.ui.downloading": "Stahování %d%%...",
+  "simple_mod_sync.ui.modifications": "Modifikace",
   "simple_mod_sync.ui.ready": "Připraveno k hraní",
   "simple_mod_sync.ui.needs_restart": "Restartujte hru",
   "simple_mod_sync.ui.error": "Chyba",
@@ -33,6 +34,7 @@
   "simple_mod_sync.ui.outcome.invalid_url": "Špatná URL",
   "simple_mod_sync.ui.outcome.download_interrupted": "Stahování přerušeno",
   "simple_mod_sync.ui.outcome.awaiting_worker": "Cekám na worker",
+  "simple_mod_sync.ui.outcome.suspicious_content": "Podezřelý obsah",
   "simple_mod_sync.ui.outcome.complete": "Dokončeno!",
   "simple_mod_sync.ui.error.exception": "Akce selhala, zkontrolujte logy"
 }

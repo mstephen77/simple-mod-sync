@@ -29,6 +29,7 @@ public class SyncFullViewScreen extends Screen implements ProgressCallback {
     private int pageSize;
     private final Screen parent;
     private SimpleBackgroundWidget progressBar;
+    private final int widgetHeight = 45;
 
     public SyncFullViewScreen(Text title, @Nullable Screen parent) {
         super(title);
@@ -49,7 +50,7 @@ public class SyncFullViewScreen extends Screen implements ProgressCallback {
     public void init() {
         super.init();
         this.progress = new HashMap<>();
-        this.pageSize = (this.height - 100) / 35;
+        this.pageSize = (this.height - 100) / this.widgetHeight;
 
         // Back button
         this.addDrawableChild(new ButtonWidget.Builder(Text.translatable("simple_mod_sync.ui.sync_full_view.back_button"),
@@ -98,13 +99,13 @@ public class SyncFullViewScreen extends Screen implements ProgressCallback {
             if (this.page > 0) {
                 this.page--;
             }
-        }).size(20, 20).position(this.width / 2 - 175, this.height - 40).build());
+        }).size(20, 20).position(this.width / 2 - 175, 45).build());
         this.addDrawableChild(new ButtonWidget.Builder(Text.translatable("simple_mod_sync.ui.sync_full_view.next_page"), (buttonWidget) -> {
-            SyncData data = SimpleModSync.worker.GetSyncData();
-            if (data != null && this.page < data.getContent().size() / this.pageSize) {
+            int numPages = (int)Math.ceil((float) this.getContentAmount() / (float)this.pageSize);
+            if (this.page < numPages - 1) {
                 this.page++;
             }
-        }).size(20, 20).position(this.width / 2 + 155, this.height - 40).build());
+        }).size(20, 20).position(this.width / 2 + 155, 45).build());
 
         this.onProgress(CallbackReason.NONE);
     }
@@ -114,10 +115,21 @@ public class SyncFullViewScreen extends Screen implements ProgressCallback {
         super.render(context, mouseX, mouseY, delta);
 
         int index = 0;
+
+        // Sort by progress then name
         List<ContentSyncProgressWidget> sortedWidgets = new ArrayList<>(progress.values());
-        sortedWidgets.sort(Comparator.comparingInt(w -> w != null && w.getProgress() == 0 ? Integer.MAX_VALUE : w != null ? w.getProgress() : Integer.MAX_VALUE));
+        sortedWidgets.sort(Comparator.comparingInt((ContentSyncProgressWidget w) ->
+            w != null && w.getProgress() == 0 ? Integer.MAX_VALUE : w != null ? w.getProgress() : Integer.MAX_VALUE)
+            .thenComparing(w -> w != null && w.getName() != null ? w.getName() : "")
+        );
+
+        // Set page size based on screen height
+        this.pageSize = (this.height - 100) / this.widgetHeight;
+
+        // Draw progress widgets
         for (ContentSyncProgressWidget widget : sortedWidgets) {
             if (widget == null) continue;
+            // Only draw widgets on the current page
             if (index >= page * pageSize && index < (page + 1) * pageSize) {
                 widget.setPosition(this.width / 2 - widget.getWidth() / 2,
                         70 + (index - page * pageSize) * widget.getHeight() + (index - page * pageSize) * 3);
@@ -138,9 +150,11 @@ public class SyncFullViewScreen extends Screen implements ProgressCallback {
         SyncData data = SimpleModSync.worker.GetSyncData();
         if (data == null) return;
         for (SyncData.Content content : data.getContent()) {
+            if (content == null) continue;
+
             ContentSyncProgress modProgress = progresses.stream().filter(p -> p.getIndex() == content.getIndex()).findFirst().orElse(null);
             if (!progress.containsKey(content.getIndex())) {
-                progress.put(content.getIndex(), new ContentSyncProgressWidget(0, 0, 300, 30, this.textRenderer, content, modProgress));
+                progress.put(content.getIndex(), new ContentSyncProgressWidget(0, 0, 350, this.widgetHeight, this.textRenderer, content, modProgress));
             }
 
             ContentSyncProgressWidget widget = progress.get(content.getIndex());
@@ -148,5 +162,15 @@ public class SyncFullViewScreen extends Screen implements ProgressCallback {
                 widget.setProgress(modProgress);
             }
         }
+    }
+
+    private int getContentAmount() {
+        SyncData data = SimpleModSync.worker.GetSyncData();
+        if (data == null) return 0;
+        int counter = 0;
+        for (int i = 0; i < data.getContent().size(); i++) {
+            if (data.getContent().get(i) != null) counter++;
+        }
+        return counter;
     }
 }

@@ -161,7 +161,7 @@ public class SyncData {
          */
         public String getFileExtension() {
             return switch (this.getType()) {
-                case "resourcepack", "shaderpack", "datapack" -> ".zip";
+                case "resourcepack", "shader", "datapack" -> ".zip";
                 case null, default -> ".jar";
             };
         }
@@ -179,7 +179,7 @@ public class SyncData {
             this.type = type;
             this.pattern = pattern;
             this.path = path;
-            this.result = null;
+            this.result = result;
         }
 
         public static Modification fromJson(int index, JsonObject jsonObject) {

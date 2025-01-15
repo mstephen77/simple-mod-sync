@@ -333,10 +333,14 @@ public class ModDownloadWorker implements Runnable {
                 var configData = ConfigData.fromJson(jsonObject);
 
                 for (String file : configData.getConfig()) {
-                    Files.delete(Path.of(file));
+                    try {
+                        Files.delete(Path.of(file));
+                    } catch (IOException e) {
+                        Log.Log.warn("bw.downloadConfig.delete.IOException","Failed to delete file, ignoring: ", e);
+                    }
                 }
             } catch (IOException e) {
-                Log.Log.error("bw.downloadConfig.read.IOException", "Failed to read file or delete changes", e);
+                Log.Log.error("bw.downloadConfig.read.IOException", "Failed to read file", e);
                 allowed = false;
             }
 
@@ -359,6 +363,9 @@ public class ModDownloadWorker implements Runnable {
             var configData = new ConfigData(modifiedFilesAsString);
             var configJsonStr = configData.toJson().toString();
             FileUtils.WriteFile(path, configJsonStr);
+
+            // Remove temp zip file
+            Files.delete(Path.of(tempZipPath));
         } catch (IOException e) {
             Log.Log.error("bw.downloadConfig.write.IOException", "Failed to download parse or write file {}", content.getName(), e);
             this.updateContentProgress(content.getIndex(), 100, ContentSyncOutcome.DOWNLOAD_INTERRUPTED , e);
@@ -395,9 +402,15 @@ public class ModDownloadWorker implements Runnable {
             return;
         }
 
+        List<String> relativeMatches = new ArrayList<>();
+        for (String match : matchData) {
+            String relativePath = Path.of(workingDirectory).relativize(Path.of(match)).toString();
+            relativeMatches.add(relativePath);
+        }
+
         List<String> matches = new ArrayList<>();
         var pattern = Pattern.compile(modification.getPattern());
-        for (var filePath : matchData) {
+        for (var filePath : relativeMatches) {
             var matcher = pattern.matcher(filePath);
             if (matcher.matches()) {
                 matches.add(filePath);

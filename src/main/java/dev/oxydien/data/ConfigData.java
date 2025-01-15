@@ -39,8 +39,11 @@ public class ConfigData {
     public JsonObject toJson() {
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("scheme_version", schemeVersion);
-        Gson gson = new Gson();
-        jsonObject.addProperty("config", gson.toJson(config));
+        JsonArray configArray = new JsonArray();
+        for (String configItem : config) {
+            configArray.add(configItem);
+        }
+        jsonObject.add("config", configArray);
         return jsonObject;
     }
 

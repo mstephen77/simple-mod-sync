@@ -71,6 +71,9 @@ public class ContentSyncProgressWidget implements Widget, Drawable, Element, Sel
     public int getProgress() {
         return this.progress != null ? this.progress.getProgress() : 0;
     }
+    public String getName() {
+        return this.content.getName();
+    }
 
     public void setProgress(@Nullable ContentSyncProgress progress) {
         this.progress = progress;

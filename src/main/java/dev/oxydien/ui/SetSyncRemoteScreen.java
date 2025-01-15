@@ -4,6 +4,7 @@ import dev.oxydien.SimpleModSync;
 import dev.oxydien.config.Config;
 import dev.oxydien.ui.widget.SimpleBackgroundWidget;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.*;
 import net.minecraft.text.Text;
@@ -21,50 +22,79 @@ public class SetSyncRemoteScreen extends Screen {
     @Override
     public void init() {
         super.init();
-        this.addDrawableChild(new SimpleBackgroundWidget(20, 20, this.width - 40, this.height - 40, 0));
-
-        // Title widget
-        Text titleText = Text.translatable("simple_mod_sync.ui.set_sync_screen.title");
-        this.addDrawableChild(
-                new MultilineTextWidget(this.width / 2 - titleText.getString().length() - 30, this.height / 2 - 40, titleText , this.textRenderer)
-                        .setTextColor(0xFF3DF6B4));
+        // Background widget
+        this.addDrawableChild(new SimpleBackgroundWidget(0, 0, this.width, this.height, 0xF1000000));
 
         // Subtitle widget
         Text subtitleText = Text.translatable("simple_mod_sync.ui.set_sync_screen.subtitle");
-        this.addDrawableChild(
-                new MultilineTextWidget(this.width / 2 - subtitleText.getString().length() - 30, this.height / 2 - 20, subtitleText , this.textRenderer)
-                        .setMaxWidth(this.width - 80).setMaxRows(2));
+        int x = this.width / 2 - subtitleText.getString().length() - 30;
+        int y = this.getPosY(2) + 5;
+        MultilineTextWidget subtitleWidget = new MultilineTextWidget(x, y, subtitleText, this.textRenderer);
+        subtitleWidget.setMaxWidth(this.width - 80);
+        subtitleWidget.setMaxRows(2);
+        this.addDrawableChild(subtitleWidget);
 
         // URL field widget
-        TextFieldWidget remote_url = new TextFieldWidget(this.textRenderer, this.width / 2 - 100, this.height / 2 + 20, 200, 20, Text.literal(""));
-        remote_url.setMaxLength(368);
-        this.addDrawableChild(remote_url);
+        int urlFieldX = this.width / 2 - 100;
+        int urlFieldY = this.getPosY(3);
+        int urlFieldWidth = 200;
+        int urlFieldHeight = 20;
+        TextFieldWidget remoteUrl = new TextFieldWidget(this.textRenderer, urlFieldX, urlFieldY, urlFieldWidth, urlFieldHeight, Text.literal(""));
+        remoteUrl.setMaxLength(368);
+        this.addDrawableChild(remoteUrl);
 
         // Auto download toggle button widget
-        AtomicBoolean autoDownload = new AtomicBoolean(Config.instance.getAutoDownload());
         Text autoDownloadTextTrue = Text.translatable("simple_mod_sync.ui.set_sync_screen.auto_download_true");
         Text autoDownloadTextFalse = Text.translatable("simple_mod_sync.ui.set_sync_screen.auto_download_false");
+        AtomicBoolean autoDownload = new AtomicBoolean(Config.instance.getAutoDownload());
+        int autoDownloadX = this.width / 2 - 70;
+        int autoDownloadY = this.getPosY(4);
         ButtonWidget auto_download = new ButtonWidget.Builder(autoDownload.get() ? autoDownloadTextTrue : autoDownloadTextFalse, (buttonWidget) -> {
             autoDownload.set(!autoDownload.get());
             buttonWidget.setMessage(autoDownload.get() ? autoDownloadTextTrue : autoDownloadTextFalse);
-        }).position(this.width / 2 - 70, this.height / 2 + 50).size(140, 20).build();
+        }).position(autoDownloadX, autoDownloadY).size(140, 20).build();
         this.addDrawableChild(auto_download);
 
         // Cancel button widget
-        this.addDrawableChild(new ButtonWidget.Builder(Text.translatable("simple_mod_sync.ui.set_sync_screen.cancel_button"), (buttonWidget) -> {
-            Config.instance.setDownloadUrl("-");
-            MinecraftClient.getInstance().setScreen(parent);
-            SimpleModSync.StartWorker();
-        }).position(this.width / 2 - 105, this.height / 2 + 80).size(100, 20).build());
+        int cancelButtonX = this.width / 2 - 105;
+        int cancelButtonY = this.getPosY(5);
+        ButtonWidget.Builder cancelBuilder = new ButtonWidget.Builder(Text.translatable("simple_mod_sync.ui.set_sync_screen.cancel_button"),
+                (buttonWidget) -> {
+                    Config.instance.setDownloadUrl("-");
+                    MinecraftClient.getInstance().setScreen(parent);
+                    SimpleModSync.StartWorker();
+                });
+        ButtonWidget cancelButton = cancelBuilder.position(cancelButtonX, cancelButtonY).size(100, 20).build();
+        this.addDrawableChild(cancelButton);
 
         // Set button widget
         this.addDrawableChild(new ButtonWidget.Builder(Text.translatable("simple_mod_sync.ui.set_sync_screen.confirm_button"), (buttonWidget) -> {
-            String url = remote_url.getText();
+            String url = remoteUrl.getText();
             if (!url.isEmpty()) {
                 Config.instance.setDownloadUrl(url);
                 MinecraftClient.getInstance().setScreen(parent);
                 SimpleModSync.StartWorker();
             }
-        }).position(this.width / 2 + 5, this.height / 2 + 80).size(100, 20).build());
+        }).position(this.width / 2 + 5, this.getPosY(5)).size(100, 20).build());
+    }
+
+    @Override
+    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
+        super.render(context, mouseX, mouseY, delta);
+        var matrices = context.getMatrices();
+
+        // Title widget
+        float scaleModifier = 1.7f;
+        matrices.push();
+        matrices.scale(scaleModifier, scaleModifier, scaleModifier); // Scale the text
+        Text titleText = Text.translatable("simple_mod_sync.ui.set_sync_screen.title");
+        int titleX = (int)(this.width * 0.6f) / 2 - titleText.getString().length() - 33;
+        int titleY = 30;
+        context.drawText(this.textRenderer, titleText, titleX, titleY, 0xFF3DF6B4, true);
+        matrices.pop();
+    }
+
+    private int getPosY(int elementIndex) {
+        return 50 + elementIndex * 25;
     }
 }

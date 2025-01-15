@@ -16,7 +16,7 @@ public class SyncOverviewWidget extends PressableWidget {
     private final TextRenderer textRenderer;
 
     public SyncOverviewWidget(TextRenderer textRenderer) {
-        super(0 ,0, 100, 28, Text.literal(""));
+        super(0 ,0, 120, 28, Text.literal(""));
         this.textRenderer = textRenderer;
     }
 
