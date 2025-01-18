@@ -8,6 +8,11 @@ This is a collection of scripts that translate modpacks from various formats to 
 
 - [Modrinth app](#modrinth-app-translator)
     - Script: `index.js`
+- [Modrinth versions](#modrinth-versions)
+    - Script: `modrinth_versions.py`
+    - Dependencies: `requests`
+- [Static folder](#static-folder)
+    - Script: `static.py`
 
 ### Contribute translator
 
@@ -80,13 +85,43 @@ The Modrinth app translator converts modpack instances from the Modrinth format 
     - The projects file must end with `-projects.json`
 - You can translate multiple instances simultaneously by including multiple pairs of input files in the `input` folder.
 
-## Output
+### Output
 
 The translator will generate files in the Simple Mod Sync format in the `output` folder.
 
-## Troubleshooting
+### Troubleshooting
 
 If you encounter any issues:
 1. Ensure you have the latest version of Node.js installed
 2. Check that the input JSON files are valid and complete
 3. Verify that you have write permissions in the `output` folder
+
+## Modrinth Versions
+
+The Modrinth versions translator converts file containing versionIDs to the Simple Mod Sync format.
+
+### Prerequisites
+
+- Python 3 installed on your system
+- Internet connection (Modrinth API)
+
+### Usage
+
+1. Create a text file (default: versions.txt) containing Modrinth version IDs, one per line
+2. Run the script: `python3 modrinth_versions.py`.
+3. The translated output will be generated in the `output` file (default: sync.json).
+
+## Static Folder
+
+The static folder translator converts all files in a given directory to the Simple Mod Sync format.
+
+### Prerequisites
+
+- Python 3 installed on your system
+
+### Usage
+
+1. Edit the configuration at the top of the file to match your needs.
+2. Run the script: `python3 static.py`.
+3. The translated output will be generated in the `output` file (default: sync.json).
+4. Host the generated file on your server.
