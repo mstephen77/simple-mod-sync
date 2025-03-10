@@ -21,7 +21,7 @@ public class SyncOverviewWidget extends PressableWidget {
     }
 
     @Override
-    protected void render(DrawContext context, int mouseX, int mouseY, float delta) {
+    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
         super.render(context, mouseX, mouseY, delta);
         SyncState state = SimpleModSync.worker.GetState();
         SyncErrorType errorType = SimpleModSync.worker.GetErrorType();
